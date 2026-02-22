@@ -115,7 +115,7 @@ All configuration can be managed through environment variables in the `.env` fil
 Stores patient information including demographics and contact details.
 
 ### VitalSigns
-Tracks patient vital measurements (heart rate, temperature, BP, etc.).
+Tracks patient vital measurements (heart rate, BP, etc.).
 
 ### HealthPrediction
 Stores prediction results from the ML model with confidence scores.

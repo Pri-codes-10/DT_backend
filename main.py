@@ -7,8 +7,13 @@ from contextlib import asynccontextmanager
 
 from config.config import config
 from app.db.database import db_manager
+from app.db.models import Base              #  ADD THIS
+from app.models import user              #  IMPORT MODELS (table creation)
+
 from app.utils.helpers import setup_logging
 from app.routes import patients, predictions
+from app.routes import auth
+
 
 # Setup logging
 setup_logging(config.LOG_FILE, config.LOG_LEVEL)
@@ -18,14 +23,24 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events."""
-    # Startup
+
+    # ------------------- STARTUP -------------------
     logger.info(f"Starting {config.APP_NAME}...")
+
+    # Set DB URL from config
     db_manager.database_url = config.DATABASE_URL
+
+    # Initialize engine + pool
     db_manager.init_db()
-    
+
+    # ✅ CREATE TABLES AT STARTUP
+    if db_manager.engine:
+        Base.metadata.create_all(bind=db_manager.engine)
+        logger.info("Database tables created / verified")
+
     yield
-    
-    # Shutdown
+
+    # ------------------- SHUTDOWN -------------------
     logger.info(f"Shutting down {config.APP_NAME}...")
     db_manager.close_db()
 
@@ -37,6 +52,9 @@ app = FastAPI(
     description="Backend service for digital twin health monitoring with LoRA fine-tuned models",
     lifespan=lifespan,
 )
+
+# Include auth router
+app.include_router(auth.router)
 
 # Add CORS middleware
 app.add_middleware(
@@ -70,13 +88,22 @@ async def health_check():
 
 # Include route modules
 # Uncomment when routes are fully implemented
-# app.include_router(patients.router, prefix=f"/api/{config.API_VERSION}/patients", tags=["patients"])
-# app.include_router(predictions.router, prefix=f"/api/{config.API_VERSION}/predictions", tags=["predictions"])
+# app.include_router(
+#     patients.router,
+#     prefix=f"/api/{config.API_VERSION}/patients",
+#     tags=["patients"]
+# )
+#
+# app.include_router(
+#     predictions.router,
+#     prefix=f"/api/{config.API_VERSION}/predictions",
+#     tags=["predictions"]
+# )
 
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "main:app",
         host=config.API_HOST,

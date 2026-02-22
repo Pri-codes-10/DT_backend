@@ -6,6 +6,8 @@ from contextlib import contextmanager
 from typing import Optional, Generator
 import logging
 
+DATABASE_URL = "postgresql://postgres:user123@localhost:5432/Digital_Twin"  # Default database URL, can be overridden by config
+
 logger = logging.getLogger(__name__)
 
 
@@ -84,4 +86,13 @@ class DatabaseManager:
 
 
 # Global database manager instance
-db_manager = DatabaseManager("")
+db_manager = DatabaseManager(DATABASE_URL)
+
+
+def get_db() -> Generator[Session, None, None]:
+    """FastAPI dependency to get a database session."""
+    session = db_manager.get_session()
+    try:
+        yield session
+    finally:
+        session.close()

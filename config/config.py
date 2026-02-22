@@ -18,7 +18,7 @@ class Config:
     # Database
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql://user:password@localhost:5432/digital_twin_health"
+        "postgresql://postgres:user123@localhost:5432/Digital_Twin"
     )
     
     # LoRA Model settings
@@ -43,6 +43,10 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
     JWT_ALGORITHM = "HS256"
     JWT_EXPIRATION_HOURS = 24
+    
+    # Google OAuth
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 
 
 class DevelopmentConfig(Config):
@@ -51,7 +55,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "sqlite:///./digital_twin_health_dev.db"
+        "postgresql://postgres:user123@localhost:5432/Digital_Twin"
     )
 
 
@@ -59,7 +63,7 @@ class TestingConfig(Config):
     """Testing configuration."""
     
     TESTING = True
-    DATABASE_URL = "sqlite:///:memory:"
+    DATABASE_URL = "postgresql://postgres:user123@localhost:5432/Digital_Twin"
 
 
 class ProductionConfig(Config):

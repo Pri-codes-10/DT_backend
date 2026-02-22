@@ -77,7 +77,6 @@ def validate_vital_signs(vitals: Dict[str, float]) -> tuple[bool, str]:
     """
     ranges = {
         "heart_rate": (40, 200),
-        "temperature": (35, 42),
         "bp_systolic": (70, 200),
         "bp_diastolic": (40, 130),
         "oxygen_saturation": (70, 100),

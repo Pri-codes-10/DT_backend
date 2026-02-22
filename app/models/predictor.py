@@ -17,14 +17,13 @@ class HealthMetricsPredictor:
         Preprocess vital signs for model input.
         
         Args:
-            vitals: Dictionary of vital signs (e.g., heart_rate, temperature, bp_systolic)
+            vitals: Dictionary of vital signs (e.g., heart_rate, bp_systolic)
             
         Returns:
             Preprocessed numpy array
         """
         features = [
             vitals.get("heart_rate", 0),
-            vitals.get("temperature", 0),
             vitals.get("bp_systolic", 0),
             vitals.get("bp_diastolic", 0),
             vitals.get("oxygen_saturation", 0),
