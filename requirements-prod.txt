@@ -1,24 +1,22 @@
-# Web
 fastapi==0.104.1
 uvicorn==0.24.0
 python-dotenv==1.0.0
-
-# Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
-
-# Validation
+alembic==1.13.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
+email-validator==2.1.0.post1
 
-# Auth
 python-jose==3.3.0
 passlib==1.7.4
-bcrypt==4.0.1
+bcrypt==4.1.1
+itsdangerous==2.1.2
+PyJWT==2.8.1
+
 google-auth==2.25.2
 google-auth-oauthlib==1.2.0
-requests==2.31.0
+google-auth-httplib2==0.2.0
 
-# Logging
+requests==2.31.0
 python-json-logger==2.0.7
-email-validator==2.1.0.post1
