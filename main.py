@@ -7,13 +7,10 @@ from contextlib import asynccontextmanager
 
 from config.config import config
 from app.db.database import db_manager
-from app.db.models import Base              #  ADD THIS
-from app.models import user              #  IMPORT MODELS (table creation)
-
+from app.db.models import Base
+from app.models import user  # Ensure models are imported
 from app.utils.helpers import setup_logging
-from app.routes import patients, predictions
 from app.routes import auth
-
 
 # Setup logging
 setup_logging(config.LOG_FILE, config.LOG_LEVEL)
@@ -27,14 +24,14 @@ async def lifespan(app: FastAPI):
     # ------------------- STARTUP -------------------
     logger.info(f"Starting {config.APP_NAME}...")
 
-    # Set DB URL from config
+    # Ensure database URL comes from environment (Render safe)
     db_manager.database_url = config.DATABASE_URL
 
-    # Initialize engine + pool
+    # Initialize DB engine + pool
     db_manager.init_db()
 
-    # ✅ CREATE TABLES AT STARTUP
-    if db_manager.engine:
+    # ⚠️ Only use this in development
+    if config.DEBUG and db_manager.engine:
         Base.metadata.create_all(bind=db_manager.engine)
         logger.info("Database tables created / verified")
 
@@ -68,7 +65,6 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
     return {
         "message": "Digital Twin Health Backend API",
         "version": "1.0.0",
@@ -78,36 +74,8 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
     db_health = db_manager.health_check()
     return {
         "status": "healthy" if db_health else "unhealthy",
         "database": "connected" if db_health else "disconnected",
     }
-
-
-# Include route modules
-# Uncomment when routes are fully implemented
-# app.include_router(
-#     patients.router,
-#     prefix=f"/api/{config.API_VERSION}/patients",
-#     tags=["patients"]
-# )
-#
-# app.include_router(
-#     predictions.router,
-#     prefix=f"/api/{config.API_VERSION}/predictions",
-#     tags=["predictions"]
-# )
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "main:app",
-        host=config.API_HOST,
-        port=config.API_PORT,
-        reload=config.DEBUG,
-        log_level=config.LOG_LEVEL.lower(),
-    )

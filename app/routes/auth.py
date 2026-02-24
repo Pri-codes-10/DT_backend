@@ -3,9 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.models.user import User
-from app.models.user_schema import UserRegister, UserLogin, GoogleLogin, UserResponse
+from app.models.user_schema import ForgotPasswordRequest, ResetPasswordRequest, UserRegister, UserLogin, GoogleLogin, UserResponse
 from app.utils.auth_utils import hash_password, verify_password
 from app.utils.google_auth_utils import google_oauth
+from app.utils.reset_utils import generate_reset_token, verify_reset_token
+from pydantic import BaseModel
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -119,3 +122,52 @@ def google_login(request: GoogleLogin, db: Session = Depends(get_db)):
         "message": "Google login successful",
         "user": UserResponse.from_orm(db_user)
     }
+
+@router.post("/forgot-password")
+def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+
+    user = db.query(User).filter(User.email == request.email).first()
+
+    # Always return generic response for security
+    if not user:
+        return {"message": "If the email exists, a reset link has been sent."}
+
+    if user.login_provider == "google":
+        raise HTTPException(
+            status_code=400,
+            detail="This account uses Google login."
+        )
+
+    token = generate_reset_token(user.email)
+
+    # Optional: store token in DB
+    user.reset_token = token
+    user.reset_token_expiry = datetime.utcnow() + timedelta(hours=0.15)
+    db.commit()
+
+    # For now, just print link (replace with real email later)
+    reset_link = f"http://localhost:3000/reset-password/{token}"
+    print("RESET LINK:", reset_link)
+
+    return {"message": "If the email exists, a reset link has been sent."}
+ 
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+
+    email = verify_reset_token(request.token)
+
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.hashed_password = hash_password(request.new_password)
+    user.reset_token = None
+    user.reset_token_expiry = None
+
+    db.commit()
+
+    return {"message": "Password reset successfully"}

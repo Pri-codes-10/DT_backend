@@ -5,8 +5,9 @@ from sqlalchemy.orm import sessionmaker, Session
 from contextlib import contextmanager
 from typing import Optional, Generator
 import logging
+import os
 
-DATABASE_URL = "postgresql://postgres:user123@localhost:5432/Digital_Twin"  # Default database URL, can be overridden by config
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:user123@localhost:5432/Digital_Twin")  # Default database URL, can be overridden by config
 
 logger = logging.getLogger(__name__)
 
@@ -32,18 +33,28 @@ class DatabaseManager:
     def init_db(self) -> None:
         """Initialize database connection and engine."""
         try:
+            connect_args = {}
+
+            # Render requires SSL
+            if "render.com" in self.database_url:
+                connect_args["sslmode"] = "require"
+
             self.engine = create_engine(
                 self.database_url,
                 pool_size=self.pool_size,
                 max_overflow=self.max_overflow,
                 echo=False,
+                connect_args=connect_args
             )
+
             self.SessionLocal = sessionmaker(
                 autocommit=False,
                 autoflush=False,
                 bind=self.engine,
             )
+
             logger.info("Database initialized successfully")
+
         except Exception as e:
             logger.error(f"Failed to initialize database: {e}")
             raise
