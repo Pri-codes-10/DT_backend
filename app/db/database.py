@@ -7,7 +7,7 @@ from typing import Optional, Generator
 import logging
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:user123@localhost:5432/Digital_Twin")  # Default database URL, can be overridden by config
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://digital_twin_tw2q_user:rm8t1cQSo5kRlybpcZ4fnMiAgYKE4SsZ@dpg-d6esf35m5p6s73fs920g-a/digital_twin_tw2q")  # Default database URL, can be overridden by config
 
 logger = logging.getLogger(__name__)
 
