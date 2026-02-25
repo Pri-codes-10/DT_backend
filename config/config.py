@@ -37,7 +37,7 @@ class Config:
     LOG_FILE = os.getenv("LOG_FILE", "logs/app.log")
     
     # CORS
-    ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5174").split(",")
     
     # JWT (if using authentication)
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
