@@ -18,7 +18,7 @@ class Config:
     # Database
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:user123@localhost:5432/Digital_Twin"
+        "postgresql://digital_twin_tw2q_user:rm8t1cQSo5kRlybpcZ4fnMiAgYKE4SsZ@dpg-d6esf35m5p6s73fs920g-a/digital_twin_tw2q"
     )
     
     # LoRA Model settings
@@ -55,7 +55,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:user123@localhost:5432/Digital_Twin"
+        "postgresql://digital_twin_tw2q_user:rm8t1cQSo5kRlybpcZ4fnMiAgYKE4SsZ@dpg-d6esf35m5p6s73fs920g-a/digital_twin_tw2q"
     )
 
 
@@ -63,7 +63,7 @@ class TestingConfig(Config):
     """Testing configuration."""
     
     TESTING = True
-    DATABASE_URL = "postgresql://postgres:user123@localhost:5432/Digital_Twin"
+    DATABASE_URL = "postgresql://digital_twin_tw2q_user:rm8t1cQSo5kRlybpcZ4fnMiAgYKE4SsZ@dpg-d6esf35m5p6s73fs920g-a/digital_twin_tw2q"
 
 
 class ProductionConfig(Config):
