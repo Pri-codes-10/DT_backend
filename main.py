@@ -26,6 +26,8 @@ async def lifespan(app: FastAPI):
 
     # Ensure database URL comes from environment (Render safe)
     db_manager.database_url = config.DATABASE_URL
+    # log the url at startup for diagnostics (masking password if needed)
+    logger.debug("using database url: %s", db_manager.database_url)
 
     # Initialize DB engine + pool
     db_manager.init_db()

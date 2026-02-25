@@ -77,11 +77,16 @@ def get_config() -> Config:
     env = os.getenv("ENVIRONMENT", "development").lower()
     
     if env == "production":
-        return ProductionConfig()
+        cfg = ProductionConfig()
     elif env == "testing":
-        return TestingConfig()
+        cfg = TestingConfig()
     else:
-        return DevelopmentConfig()
+        cfg = DevelopmentConfig()
+    
+    # enforce presence of DATABASE_URL in non-development environments
+    if env in ("production", "testing") and not cfg.DATABASE_URL:
+        raise RuntimeError("DATABASE_URL environment variable must be set")
+    return cfg
 
 
 # Global config instance
