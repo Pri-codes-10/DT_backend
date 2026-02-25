@@ -1,5 +1,5 @@
 """Database connection manager."""
-
+from sqlalchemy import text
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
 from contextlib import contextmanager
@@ -33,18 +33,11 @@ class DatabaseManager:
     def init_db(self) -> None:
         """Initialize database connection and engine."""
         try:
-            connect_args = {}
-
-            # Render requires SSL
-            if "render.com" in self.database_url:
-                connect_args["sslmode"] = "require"
-
             self.engine = create_engine(
                 self.database_url,
                 pool_size=self.pool_size,
                 max_overflow=self.max_overflow,
                 echo=False,
-                connect_args=connect_args
             )
 
             self.SessionLocal = sessionmaker(
@@ -53,7 +46,11 @@ class DatabaseManager:
                 bind=self.engine,
             )
 
-            logger.info("Database initialized successfully")
+            # 🔥 FORCE TEST CONNECTION
+            with self.engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+
+            logger.info("Database initialized and connected successfully")
 
         except Exception as e:
             logger.error(f"Failed to initialize database: {e}")
