@@ -82,15 +82,22 @@ class DatabaseManager:
             self.engine.dispose()
             logger.info("Database connections closed")
     
-    def health_check(self) -> bool:
-        """Check database connectivity."""
-        try:
-            with self.session_scope() as session:
-                session.execute("SELECT 1")
-            return True
-        except Exception as e:
-            logger.error(f"Database health check failed: {e}")
+    from sqlalchemy import text
+
+def health_check(self) -> bool:
+    """Check database connectivity."""
+    try:
+        if not self.engine:
             return False
+
+        with self.engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return True
+
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        return False
 
 
 # Global database manager instance
